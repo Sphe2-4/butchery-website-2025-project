@@ -1,0 +1,116 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4><i class="bi bi-plus-circle"></i> Add New Product</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Product Name and Category -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            {{ form.name.label(class="form-label fw-bold") }}
+                            {{ form.name(class="form-control form-control-lg", placeholder="Enter product name") }}
+                            {% if form.name.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.name.errors %}
+                                        <small><i class="bi bi-exclamation-circle"></i> {{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.category.label(class="form-label fw-bold") }}
+                            {{ form.category(class="form-select form-select-lg") }}
+                            {% if form.category.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.category.errors %}
+                                        <small><i class="bi bi-exclamation-circle"></i> {{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label fw-bold") }}
+                        {{ form.description(class="form-control", rows="3", placeholder="Product description (optional)") }}
+                        <div class="form-text">Brief description to help customers understand the product</div>
+                        {% if form.description.errors %}
+                            <div class="text-danger">
+                                {% for error in form.description.errors %}
+                                    <small><i class="bi bi-exclamation-circle"></i> {{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Price and Stock -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.price.label(class="form-label fw-bold") }}
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-success text-white">R</span>
+                                {{ form.price(class="form-control", placeholder="0.00", step="0.01") }}
+                            </div>
+                            <div class="form-text">Price in South African Rand</div>
+                            {% if form.price.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.price.errors %}
+                                        <small><i class="bi bi-exclamation-circle"></i> {{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.stock_quantity.label(class="form-label fw-bold") }}
+                            {{ form.stock_quantity(class="form-control form-control-lg", placeholder="0") }}
+                            <div class="form-text">Number of items in stock</div>
+                            {% if form.stock_quantity.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.stock_quantity.errors %}
+                                        <small><i class="bi bi-exclamation-circle"></i> {{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Product Image -->
+                    <div class="mb-4">
+                        {{ form.image.label(class="form-label fw-bold") }}
+                        {{ form.image(class="form-control form-control-lg", accept="image/*") }}
+                        <div class="form-text">Upload a product image (JPG, PNG, GIF - Max 16MB)</div>
+                        {% if form.image.errors %}
+                            <div class="text-danger mt-1">
+                                {% for error in form.image.errors %}
+                                    <small><i class="bi bi-exclamation-circle"></i> {{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 pt-3 border-top">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> Add Product
+                        </button>
+                        <a href="{{ url_for('admin_products') }}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

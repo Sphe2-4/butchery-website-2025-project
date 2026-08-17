@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-shield-check"></i> Verify Phone Number</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    We've sent a 6-digit code to your phone number. Please enter it below to complete registration.
+                </div>
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.otp.label(class="form-label") }}
+                        {{ form.otp(class="form-control text-center", style="font-size: 1.5em; letter-spacing: 0.5em;", maxlength="6") }}
+                        {% if form.otp.errors %}
+                            <div class="text-danger">
+                                {% for error in form.otp.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100">Verify Code</button>
+                </form>
+                
+                <hr>
+                <p class="text-center mb-0">
+                    Didn't receive the code? <a href="{{ url_for('register') }}">Try again</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section bg-primary text-white py-5 mb-5 rounded">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Welcome to 32slayer butchery</h1>
+        <p class="lead">Creating Meat Magic Daily!</p>
+        <p class="mb-4">Premium quality meats delivered fresh to your door</p>
+        <a href="{{ url_for('catalog') }}" class="btn btn-warning btn-lg">Shop Now</a>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4"><i class="bi bi-info-circle text-primary"></i> Getting Started</h3>
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="h1 text-primary mb-2">1</div>
+                        <h5>Accept Cookies</h5>
+                        <p class="text-muted small">Accept cookies for a secure and seamless session.</p>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="h1 text-primary mb-2">2</div>
+                        <h5>Register</h5>
+                        <p class="text-muted small">Create a secure account with a strong password.</p>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="h1 text-primary mb-2">3</div>
+                        <h5>Browse</h5>
+                        <p class="text-muted small">Explore our premium meat catalog by category.</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="h1 text-primary mb-2">4</div>
+                        <h5>Order</h5>
+                        <p class="text-muted small">Add items to your cart and complete your purchase.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <h2>Featured Products</h2>
+        <div class="row">
+            {% for product in products[:4] %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    {% if product.image_url %}
+                    <img src="{{ url_for('static', filename=product.image_url) }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description[:100] }}...</p>
+                        <p class="card-text"><strong>R{{ "%.2f"|format(product.price) }}</strong></p>
+                        {% if product.stock_quantity > 0 %}
+                            <span class="badge bg-success">In Stock ({{ product.stock_quantity }})</span>
+                        {% else %}
+                            <span class="badge bg-danger">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        {% if product.stock_quantity > 0 %}
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.is_admin %}
+                                    <a href="{{ url_for('admin_edit_product', product_id=product.id) }}" class="btn btn-warning">Edit Product</a>
+                                {% else %}
+                                    <a href="{{ url_for('add_to_cart', product_id=product.id) }}" class="btn btn-primary">Add to Cart</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Login to Add to Cart</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Contact Information</h5>
+            </div>
+            <div class="card-body">
+                <p><i class="bi bi-geo-alt text-primary"></i> 93B Charles Street<br>Bloemfontein, South Africa</p>
+                <p><i class="bi bi-telephone text-primary"></i> 051 446 0156</p>
+                <p><i class="bi bi-whatsapp text-success"></i> 082 588 3367</p>
+                <p><i class="bi bi-envelope text-primary"></i> sales@highveld.co.za</p>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Why Choose Us?</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle text-success"></i> Premium Quality Meats</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Fresh Daily Delivery</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Secure Online Payments</li>
+                    <li><i class="bi bi-check-circle text-success"></i> Trusted Local Butchery</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
