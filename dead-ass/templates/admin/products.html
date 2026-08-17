@@ -1,0 +1,235 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-box-seam"></i> Product Management</h2>
+    <a href="{{ url_for('admin_add_product') }}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Add Product
+    </a>
+</div>
+
+<!-- Search and Filter Bar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search products...">
+            </div>
+            <div class="col-md-3">
+                <select id="categoryFilter" class="form-select">
+                    <option value="">All Categories</option>
+                    <option value="beef">Beef</option>
+                    <option value="pork">Pork</option>
+                    <option value="chicken">Chicken</option>
+                    <option value="lamb">Lamb</option>
+                    <option value="processed">Processed Meats</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button onclick="clearFilters()" class="btn btn-outline-secondary w-100">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Actions -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <div class="d-flex align-items-center gap-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="selectAll">
+                <label class="form-check-label" for="selectAll">Select All</label>
+            </div>
+            <button id="bulkDeactivate" class="btn btn-sm btn-outline-danger" style="display: none;">
+                <i class="bi bi-trash"></i> Deactivate Selected
+            </button>
+            <button id="bulkActivate" class="btn btn-sm btn-outline-success" style="display: none;">
+                <i class="bi bi-check-circle"></i> Activate Selected
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="productsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th width="50">
+                            <input type="checkbox" id="headerCheckbox" class="form-check-input">
+                        </th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th width="120">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr data-category="{{ product.category }}" data-status="{% if product.is_active %}active{% else %}inactive{% endif %}">
+                        <td>
+                            <input type="checkbox" class="form-check-input product-checkbox" value="{{ product.id }}">
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if product.image_url %}
+                                <img src="{{ url_for('static', filename=product.image_url) }}" 
+                                     alt="{{ product.name }}" 
+                                     class="img-thumbnail me-3" 
+                                     style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light border rounded me-3 d-flex align-items-center justify-content-center" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ product.name }}</strong>
+                                    {% if product.description %}
+                                    <br><small class="text-muted">{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ product.category.title() }}</span>
+                        </td>
+                        <td>
+                            <strong>R{{ "%.2f"|format(product.price) }}</strong>
+                        </td>
+                        <td>
+                            {% if product.stock_quantity > 10 %}
+                                <span class="badge bg-success">{{ product.stock_quantity }}</span>
+                            {% elif product.stock_quantity > 0 %}
+                                <span class="badge bg-warning text-dark">{{ product.stock_quantity }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">Out of Stock</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if product.is_active %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Active</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('admin_edit_product', product_id=product.id) }}" 
+                                   class="btn btn-outline-primary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if product.is_active %}
+                                <a href="{{ url_for('admin_delete_product', product_id=product.id) }}" 
+                                   class="btn btn-outline-danger" title="Deactivate"
+                                   onclick="return confirm('Deactivate {{ product.name }}?')">
+                                    <i class="bi bi-eye-slash"></i>
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('admin_activate_product', product_id=product.id) }}" 
+                                   class="btn btn-outline-success" title="Activate">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', filterTable);
+document.getElementById('categoryFilter').addEventListener('change', filterTable);
+document.getElementById('statusFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const rows = document.querySelectorAll('#productsTable tbody tr');
+    
+    rows.forEach(row => {
+        const productName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const category = row.getAttribute('data-category');
+        const status = row.getAttribute('data-status');
+        
+        const matchesSearch = productName.includes(searchTerm);
+        const matchesCategory = !categoryFilter || category === categoryFilter;
+        const matchesStatus = !statusFilter || status === statusFilter;
+        
+        if (matchesSearch && matchesCategory && matchesStatus) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('categoryFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    filterTable();
+}
+
+// Bulk selection functionality
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.product-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateBulkActions();
+});
+
+document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', updateBulkActions);
+});
+
+function updateBulkActions() {
+    const selectedBoxes = document.querySelectorAll('.product-checkbox:checked');
+    const bulkDeactivate = document.getElementById('bulkDeactivate');
+    const bulkActivate = document.getElementById('bulkActivate');
+    
+    if (selectedBoxes.length > 0) {
+        bulkDeactivate.style.display = 'inline-block';
+        bulkActivate.style.display = 'inline-block';
+    } else {
+        bulkDeactivate.style.display = 'none';
+        bulkActivate.style.display = 'none';
+    }
+}
+
+// Bulk actions
+document.getElementById('bulkDeactivate').addEventListener('click', function() {
+    const selected = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.value);
+    if (selected.length > 0 && confirm(`Deactivate ${selected.length} product(s)?`)) {
+        window.location.href = `/admin/products/bulk_deactivate?ids=${selected.join(',')}`;
+    }
+});
+
+document.getElementById('bulkActivate').addEventListener('click', function() {
+    const selected = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.value);
+    if (selected.length > 0 && confirm(`Activate ${selected.length} product(s)?`)) {
+        window.location.href = `/admin/products/bulk_activate?ids=${selected.join(',')}`;
+    }
+});
+</script>
+{% endblock %}

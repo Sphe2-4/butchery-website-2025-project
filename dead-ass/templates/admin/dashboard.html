@@ -1,0 +1,147 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+    <div class="btn-group">
+        <a href="{{ url_for('export_data') }}" class="btn btn-success">
+            <i class="bi bi-download"></i> Export All Data
+        </a>
+        <a href="{{ url_for('export_purchases') }}" class="btn btn-outline-success">
+            <i class="bi bi-cart-check"></i> Export Purchases
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_users }}</h4>
+                        <p class="card-text">Total Users</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_products }}</h4>
+                        <p class="card-text">Total Products</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-box" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_orders }}</h4>
+                        <p class="card-text">Total Orders</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-cart-check" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4><i class="bi bi-shield-check"></i></h4>
+                        <p class="card-text">Security</p>
+                    </div>
+                    <div class="align-self-center">
+                        <a href="{{ url_for('security_logins') }}" class="btn btn-light btn-sm">View Logs</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_products') }}" class="btn btn-primary">
+                        <i class="bi bi-list-ul"></i> View Product List
+                    </a>
+                    <a href="{{ url_for('admin_add_product') }}" class="btn btn-outline-success">
+                        <i class="bi bi-plus-circle"></i> Add New Product
+                    </a>
+                    <a href="{{ url_for('admin_products') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-box-seam"></i> Manage Products
+                    </a>
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-people"></i> Manage Users
+                    </a>
+                    <a href="{{ url_for('admin_settings') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-gear"></i> Site Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Orders</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_orders %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td>{{ order.user.username }}</td>
+                                <td>R{{ "%.2f"|format(order.total_amount) }}</td>
+                                <td><span class="badge bg-success">{{ order.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No recent orders</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
