@@ -1,6 +1,6 @@
 # 32slayer butchery  - Web Application
 
-A professional web application by 32slayer for an alias butchery , featuring a product catalog, user authentication, secure sessions, and an admin dashboard.
+A professional web application by Siphelele Elliot Mosoeu also known as 32slayer for an alias butchery , featuring a product catalog, user authentication, secure sessions, and an admin dashboard.
 
 ## Features
 - **Product Catalog:** Browse various meat categories (Beef, Pork, Chicken, Lamb, etc.).
